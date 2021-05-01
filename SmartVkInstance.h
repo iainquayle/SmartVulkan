@@ -31,6 +31,7 @@ namespace vk
 		//static vk::UniqueInstance
 		static vk::Instance instance;
 
+		static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr; //keep for device dispatchers
 		static vk::DynamicLoader loader; //get rid of this too? just need it for the start of the intial init, though it may be held onto by the dispatcher
 
 		static bool enableDebug;

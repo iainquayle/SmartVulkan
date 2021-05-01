@@ -1,6 +1,3 @@
-
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-
 #include "SmartVkInstance.h"
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
@@ -22,6 +19,7 @@ namespace vk
 	vk::DebugUtilsMessengerEXT SmartVkInstance::debugUtilsMessenger;
 	bool SmartVkInstance::enableDebug = false;
 
+	PFN_vkGetInstanceProcAddr SmartVkInstance::vkGetInstanceProcAddr;
 	vk::DynamicLoader SmartVkInstance::loader;
 
 	SmartVkInstance::SmartVkInstance()
@@ -44,7 +42,7 @@ namespace vk
 	void SmartVkInstance::initInstance(std::string appName, std::string engineName, uint32_t appVersion,  std::vector<const char*> extensions, std::vector<const char*> debugExtensions, std::vector<const char*> layers, bool enableDebug)
 	{
 		//setting up the dynamic dispatcher to find the functions need to initialize the instance?
-		PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
+		vkGetInstanceProcAddr = loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
 		VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
 
 		SmartVkFunctions::printDebugStr("Initializing instance");
@@ -121,10 +119,7 @@ namespace vk
 		{
 			SmartVkFunctions::error("instance not initialized before retrieving new dispatch loader");
 		}
-		PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = loader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-		vk::DispatchLoaderDynamic loader;
-		loader.init(vkGetInstanceProcAddr);
-		loader.init(instance);
+		vk::DispatchLoaderDynamic loader(instance, vkGetInstanceProcAddr);
 
 		return loader;
 	}

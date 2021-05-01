@@ -1,8 +1,8 @@
-//#pragma once
 #ifndef SMART_VK_INCLUDES
 #define SMART_VK_INCLUDES
-#endif // 
+#endif
 
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 
 #include <vulkan/vulkan.hpp>
 #include <vector>

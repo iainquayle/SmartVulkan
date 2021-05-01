@@ -14,21 +14,22 @@ namespace vk
 		* for device rating functions and device features functions it is assumed that any information required is included by the creator of the function and only device specific items are passed to the function through arguments
 		* this was done because of the shear number of possible items one may need to pass in to rate a device, and there is no standard method of operation on them ruling out templates
 		*/
+	public:
 		/*
 		* device features functions are for the writting of logic behind condtionaly activated features.
 		*/
-		typedef vk::PhysicalDeviceFeatures2 (*deviceConditionalFeaturesFunc)(vk::PhysicalDevice);
+		typedef vk::PhysicalDeviceFeatures2(*deviceConditionalFeaturesFunc)(vk::PhysicalDevice);
 		/*
-		* device rating functions 
+		* device rating functions
 		*/
-		typedef float (*deviceRatingFunc)(vk::PhysicalDevice, std::vector<SmartVkQueue*>, float);
+		typedef float (*deviceRatingFunc)(vk::PhysicalDevice, std::vector<SmartVkQueue*>, float); //float (*deviceRatingFunc)(vk::PhysicalDevice, std::vector<SmartVkQueue*>, std::vector<const char*>, float); maybe just add an extensions vector that automatically shows what extensions will be loaded?
 		typedef float (*allocateQueueFamiliesFunc)(vk::PhysicalDevice, std::vector<SmartVkQueue*>);
 
-	public:
 		vk::Device device;
 		vk::PhysicalDevice physicalDevices[VK_MAX_DEVICE_GROUP_SIZE]; //devices in a group if avaiable, all devices must have the same vendorId and deviceId
 		uint32_t physicalDevicesCount; //acts for isDeviceGroup
 
+		//apperently there isn't really a need for this
 		vk::DispatchLoaderDynamic dispatcher;
 
 		SmartVkDevice();

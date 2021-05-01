@@ -93,7 +93,6 @@ namespace vk
 		for (size_t i = 0; i < availableDevices.size(); i++)
 		{
 			properties = availableDevices.at(i).getProperties();
-			std::cout << "\trating device: " << properties.deviceName << '\n';
 			SmartVkFunctions::printDebugStr(1, "rating device:", false);  //maybe make print debug take in a list of strings, then just have an overloaded one with one
 			SmartVkFunctions::printDebugStr((std::string)properties.deviceName);
 
@@ -152,12 +151,13 @@ namespace vk
 	}
 	void SmartVkDevice::initDevice(vk::PhysicalDevice physicalDevices[VK_MAX_DEVICE_GROUP_SIZE], uint32_t physicalDeviceCount, std::vector<SmartVkQueue*> queuePtrList, vk::PhysicalDeviceFeatures2 features, allocateQueueFamiliesFunc allocateQueueFamilies, std::vector<const char*> extensions, std::vector<const char*> debugExtensions, std::vector<const char*> layers)
 	{
-		std::cout << "initiating logical device\n";
+		vk::SmartVkFunctions::printDebugStr(0, "initiating logical device", true);
 		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 		std::vector<std::vector<float>> queuePriorities;
 		bool queueFamilyFound;
 
-		//re organizing queues
+		//re allocating queues to where the should be for 
+		vk::SmartVkFunctions::printDebugStr(1, "allocating queues and setting queue info for device creation");
 		allocateQueueFamilies(physicalDevices[0], queuePtrList);
 
 		//creating lists of queue priorities for queue create info structs
@@ -186,18 +186,23 @@ namespace vk
 			queueCreateInfos.at(i).setPQueuePriorities(queuePriorities.at(i).data());
 		}
 
+		//adding debug extensions if they are required, think this may need getting rid of????
 		if (SmartVkInstance::enableDebug)
 		{
 			extensions = SmartVkFunctions::addCharVectors(extensions, debugExtensions);
 		}
 		else
 		{
-			layers = std::vector<const char*>(0);
+			layers.clear();
 		}
 
-		vk::DeviceCreateInfo createInfo(vk::DeviceCreateFlags(0), (uint32_t)queueCreateInfos.size(), queueCreateInfos.data(), (uint32_t)layers.size(), layers.data(), (uint32_t)extensions.size(), extensions.data(), &(features.features));
+		//changing active extensions to the intersect of the available extensions and requested extensions
+		extensions = vk::SmartVkDevice::extensionsIntersect(physicalDevices[0], extensions);
+
+		vk::DeviceCreateInfo createInfo(vk::DeviceCreateFlags(0), (uint32_t)queueCreateInfos.size(), queueCreateInfos.data(), (uint32_t)layers.size(), layers.data(), (uint32_t)extensions.size(), extensions.data(), nullptr /*&(features.features) if features 2 is in pnext, features must be null*/);
 		createInfo.setPNext(&features);
 
+		//setting device group info incase it is available
 		vk::DeviceGroupDeviceCreateInfo groupCreateInfo(physicalDeviceCount, physicalDevices);
 		groupCreateInfo.setPNext(&features);
 		if (physicalDeviceCount > 1)
@@ -206,17 +211,17 @@ namespace vk
 		}
 
 		device = physicalDevices[0].createDevice(createInfo);
-		std::cout << "\tlogical device and queues created\n";
+		SmartVkFunctions::printDebugStr(1, "logical device created");
 
 		//TODO: change to distribute device queues function?
 		for (size_t i = 0; i < queuePtrList.size(); i++)
 		{
 			queuePtrList.at(i)->queue = device.getQueue(queuePtrList.at(i)->queueFamilyIndex, queuePtrList.at(i)->indexInQueueFamily);
 		}
-		std::cout << "\tqueues assigned to smart queues\n";
+		SmartVkFunctions::printDebugStr("queues assigned to smart queues");
 
-		dispatcher = SmartVkInstance::getNewDispatchDynam();
-		dispatcher.init(device);
+		//intializing function dispatcher specific to the device created, slightly more efficient
+		dispatcher.init(SmartVkInstance::instance, SmartVkInstance::vkGetInstanceProcAddr, device);
 	}
 
 	float SmartVkDevice::defaultAllocateQueueFamilies(vk::PhysicalDevice physicalDevice, std::vector<SmartVkQueue*> queuePtrList)
@@ -431,7 +436,6 @@ namespace vk
 				if (strcmp(extensions.at(i), availableExtensions.at(j).extensionName) == 0)
 				{
 					intersection.push_back(extensions.at(i));
-
 					found = true;
 				}
 			}
