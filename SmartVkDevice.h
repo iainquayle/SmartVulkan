@@ -27,10 +27,11 @@ namespace vk
 
 		vk::Device device;
 		vk::PhysicalDevice physicalDevices[VK_MAX_DEVICE_GROUP_SIZE]; //devices in a group if avaiable, all devices must have the same vendorId and deviceId
-		uint32_t physicalDevicesCount; //acts for isDeviceGroup
+		uint32_t physicalDevicesCount;
 
-		//apperently there isn't really a need for this
 		vk::DispatchLoaderDynamic dispatcher;
+
+		//std::vector<const char*> extensions;
 
 		SmartVkDevice();
 		SmartVkDevice(std::vector<SmartVkQueue*> queuePtrList, vk::PhysicalDeviceFeatures2 features, deviceRatingFunc rateDevice, allocateQueueFamiliesFunc allocateQueueFamilies, std::vector<const char*> extensions, std::vector<const char*> debugExtensions, std::vector<const char*> layers, bool createDeviceGroup);
@@ -42,7 +43,6 @@ namespace vk
 		void pickInitDevice(std::vector<SmartVkQueue*> queuePtrList, vk::PhysicalDeviceFeatures2 features, deviceRatingFunc rateDevice, allocateQueueFamiliesFunc allocateQueueFamilies, std::vector<const char*> extensions = std::vector<const char*>(), std::vector<const char*> debugExtensions = std::vector<const char*>(), std::vector<const char*> layers = std::vector<const char*>(), bool createDeviceGroup = true);
 		void pickInitDevice(std::vector<SmartVkQueue*> queuePtrList, deviceConditionalFeaturesFunc getFeatures, deviceRatingFunc rateDevice, allocateQueueFamiliesFunc allocateQueueFamilies, std::vector<const char*> extensions = std::vector<const char*>(), std::vector<const char*> debugExtensions = std::vector<const char*>(), std::vector<const char*> layers = std::vector<const char*>(), bool createDeviceGroup = true);
 
-		//kept seperate for debugging purposes
 		void pickDevice(std::vector<SmartVkQueue*> queuePtrList, deviceRatingFunc rateDevice, allocateQueueFamiliesFunc allocateQueueFamilies);
 
 		void initDevice(vk::PhysicalDevice physicalDevice, std::vector<SmartVkQueue*> queuePtrList, vk::PhysicalDeviceFeatures2 features, std::vector<const char*> extensions = std::vector<const char*>(), std::vector<const char*> debugExtensions = std::vector<const char*>(), std::vector<const char*> layers = std::vector<const char*>());
@@ -57,13 +57,8 @@ namespace vk
 		static vk::PhysicalDeviceFeatures2 featuresIntersect(vk::PhysicalDevice physicalDevice, vk::PhysicalDeviceFeatures2 features); //this cannot be done with out hard coding the feature extension types
 		static std::vector<const char*> extensionsIntersect(vk::PhysicalDevice physicalDevice, std::vector<const char*> extensions);
 
-		static vk::PhysicalDeviceFeatures2 cloneFeatures2(vk::PhysicalDeviceFeatures2 features); //would require hard coding (switch)
-		static vk::PhysicalDeviceProperties2 cloneProperties2(vk::PhysicalDeviceProperties2 features); //would require hard coding (switch)
-		static vk::PhysicalDeviceMemoryProperties2 cloneMemoryProperties2(vk::PhysicalDeviceMemoryProperties2 properties);
-
 		static bool hasExtensionSupport(vk::PhysicalDevice physicalDevice, std::vector<const char*> extensions);
 		static bool hasFeatureSupport(vk::PhysicalDevice physicalDevice, vk::PhysicalDeviceFeatures features);
-		static bool featureMemCmp(VkBool32* features, VkBool32* deviceFeatures, size_t memSize);
 
 		void getDeviceQueue(SmartVkQueue* queue);
 		static std::vector<vk::PhysicalDevice> getAvailableDevices();
@@ -81,8 +76,8 @@ namespace vk
 		std::vector<SmartVkQueue*> queuePtrList;
 		size_t deviceIndex;
 
-		static std::vector<vk::PhysicalDevice> availableDevices; //required to make a this or else some underlying struct or obj is destroyed when you want to get information from the physical device handle
-		static std::vector<vk::PhysicalDeviceGroupProperties> availableDeviceGroups; //same as above, i dont know if having the other std::vector would support the these structs
+		static std::vector<vk::PhysicalDevice> availableDevices; //required to make a this or else some underlying struct or obj is destroyed when you want to get information from the physical device handle, then leave scope of the original vector
+		static std::vector<vk::PhysicalDeviceGroupProperties> availableDeviceGroups; //same as above, dont know if the structs from the above are the same 
 
 		static std::vector<SmartVkDevice*> selfPtrList;
 	};

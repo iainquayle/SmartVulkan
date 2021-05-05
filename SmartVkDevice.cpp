@@ -221,6 +221,7 @@ namespace vk
 		SmartVkFunctions::printDebugStr("queues assigned to smart queues");
 
 		//intializing function dispatcher specific to the device created, slightly more efficient
+		//this will now be used with any vulkan functions called by the device or objects that use the device (command pools and buffers etc)
 		dispatcher.init(SmartVkInstance::instance, SmartVkInstance::vkGetInstanceProcAddr, device);
 	}
 
@@ -394,6 +395,7 @@ namespace vk
 	}
 	vk::PhysicalDeviceFeatures2 SmartVkDevice::featuresIntersect(vk::PhysicalDevice physicalDevice, vk::PhysicalDeviceFeatures2 features)
 	{
+		/*
 		features.features = featuresIntersect(physicalDevice, features.features);//intersects the regular features
 
 		vk::PhysicalDeviceFeatures2 deviceFeatures = cloneFeatures2(features);
@@ -421,7 +423,10 @@ namespace vk
 			}
 		}
 		return features;
+		//*/
+		return vk::PhysicalDeviceFeatures2();
 	}
+
 	std::vector<const char*> SmartVkDevice::extensionsIntersect(vk::PhysicalDevice physicalDevice, std::vector<const char*> extensions)
 	{
 		std::vector<vk::ExtensionProperties> availableExtensions = physicalDevice.enumerateDeviceExtensionProperties();
@@ -440,44 +445,7 @@ namespace vk
 				}
 			}
 		}
-
 		return intersection;
-	}
-
-	// TODO: finish cloning functions
-	vk::PhysicalDeviceFeatures2 SmartVkDevice::cloneFeatures2(vk::PhysicalDeviceFeatures2 features)
-	{
-		vk::PhysicalDeviceFeatures2 deviceFeatures;
-
-		void* featuresPtr = features.pNext;
-		void* deviceFeaturesPtr = deviceFeatures.pNext;
-
-		while (featuresPtr != nullptr)
-		{
-			switch (*((VkStructureType*)featuresPtr))
-			{
-			case(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES):
-
-				break;
-			case(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES):
-
-				break;
-			default:
-
-				break;
-			}
-		}
-
-
-		return features;
-	}
-	vk::PhysicalDeviceProperties2 SmartVkDevice::cloneProperties2(vk::PhysicalDeviceProperties2 properties)
-	{
-		return properties;
-	}
-	vk::PhysicalDeviceMemoryProperties2 SmartVkDevice::cloneMemoryProperties2(vk::PhysicalDeviceMemoryProperties2 properties)
-	{
-		return properties;
 	}
 
 	bool SmartVkDevice::hasExtensionSupport(vk::PhysicalDevice physicalDevice, std::vector<const char*> extensions)
