@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SmartVkIncludes.h"
+#include "SmartVkInstance.h"
 #include "SmartVkQueue.h"
 #include "SmartVkDevice.h"
 

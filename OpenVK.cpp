@@ -5,11 +5,16 @@ using namespace std;
 
 vk::SmartVkDevice device;
 vk::PhysicalDeviceFeatures2 features;
-vk::SmartVkCommandPool commandPool;
 
 static vk::SmartVkQueue computeQueue(vk::QueueFlags(VK_QUEUE_COMPUTE_BIT), 1.0f, 1.0f);
 static vk::SmartVkQueue transferQueue(vk::QueueFlags(VK_QUEUE_TRANSFER_BIT), 1.0f, 1.0f);
 static vk::SmartVkQueue presentQueue(vk::QueueFlags(VK_QUEUE_GRAPHICS_BIT), 1.0f, 1.0f);
+
+vk::SmartVkCommandPool computePool;
+vk::SmartVkCommandPool transferPool;
+vk::SmartVkCommandPool presentPool;
+
+
 
 static vector<const char*> instanceExtensions =
 {
@@ -42,7 +47,7 @@ int main()
 	features.features.shaderFloat64 = true;
 	features.features.shaderInt64 = true;
 	device.pickInitDevice({ &computeQueue, &transferQueue, &presentQueue }, features, &rateDevice, deviceExtensions, deviceDebugExtensions, validationLayers);
-	commandPool.initCommandPool(&device, &computeQueue);
+	computePool.initCommandPool(&device, &computeQueue);
 }
 
 float rateDevice(vk::PhysicalDevice device, std::vector<vk::SmartVkQueue*> queuePtrList, float queueScore)

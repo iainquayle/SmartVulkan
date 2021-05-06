@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="OpenVK.cpp" />
+    <ClCompile Include="SmartVkCommandBuffer.cpp" />
     <ClCompile Include="SmartVkCommandPool.cpp" />
     <ClCompile Include="SmartVkDevice.cpp" />
     <ClCompile Include="SmartVkFunctions.cpp" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SmartVk.h" />
+    <ClInclude Include="SmartVkCommandBuffer.h" />
     <ClInclude Include="SmartVkCommandPool.h" />
     <ClInclude Include="SmartVkDevice.h" />
     <ClInclude Include="SmartVkFunctions.h" />
